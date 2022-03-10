@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.martiniriarte.error.ProductoNoEncontradoException;
 import com.martiniriarte.modelo.Producto;
 import com.martiniriarte.persistencia.ProductoDAO;
 
@@ -20,7 +21,7 @@ public class ServicioProducto {
 	}
 
 	public Producto buscarPorId(Long id) {
-		return productoDAO.findById(id).orElse(null);
+		return productoDAO.findById(id).orElseThrow(() -> new ProductoNoEncontradoException(id));
 	}
 
 	public Producto guardar(Producto producto) {

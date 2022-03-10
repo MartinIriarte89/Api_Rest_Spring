@@ -12,7 +12,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.martiniriarte.dto.DetalleProductoDTO;
+import com.martiniriarte.dto.ProductoDTO;
+import com.martiniriarte.error.ProductoNoEncontradoException;
 import com.martiniriarte.modelo.Producto;
+import com.martiniriarte.servicio.ServicioConvertidorProductoDTO;
 import com.martiniriarte.servicio.ServicioProducto;
 
 import lombok.RequiredArgsConstructor;
@@ -22,51 +26,46 @@ import lombok.RequiredArgsConstructor;
 public class ProductoControlador {
 
 	private final ServicioProducto servicioProducto;
+	private final ServicioConvertidorProductoDTO convertidor;
 
 	@GetMapping("/producto")
-	public ResponseEntity<List<Producto>> obtenerTodos() {
+	public ResponseEntity<List<DetalleProductoDTO>> obtenerTodos() {
 		List<Producto> productos = servicioProducto.buscarTodos();
 		if (productos.isEmpty()) {
 			return ResponseEntity.notFound().build();
 		} else {
-			return ResponseEntity.ok(productos);
+			return ResponseEntity.ok(convertidor.convertirAListDto(productos));
 		}
 	}
 
 	@GetMapping("/producto/{id}")
-	public ResponseEntity<Producto> obtenerUno(@PathVariable Long id) {
-		Producto producto = servicioProducto.buscarPorId(id);
-		if (producto == null) {
-			return ResponseEntity.notFound().build();
-		} else {
-			return ResponseEntity.ok(producto);
-		}
+	public ResponseEntity<DetalleProductoDTO> obtenerUno(@PathVariable Long id) {
+		return ResponseEntity.ok(convertidor.convertirADto(servicioProducto.buscarPorId(id)));
+		
 	}
 
 	@PostMapping("/producto")
-	public ResponseEntity<Producto> nuevoProducto(@RequestBody Producto producto) {
+	public ResponseEntity<DetalleProductoDTO> nuevoProducto(@RequestBody ProductoDTO crearProductoDTO) {
+		Producto producto = convertidor.convertirProductoDtoAProducto(crearProductoDTO);
 		producto = servicioProducto.guardar(producto);
-		return ResponseEntity.status(HttpStatus.CREATED).body(producto);
+		return ResponseEntity.status(HttpStatus.CREATED).body(convertidor.convertirADto(producto));
 	}
 
 	@PutMapping("/producto/{id}")
-	public ResponseEntity<Producto> editarProducto(@RequestBody Producto producto, @PathVariable Long id) {
-		if (servicioProducto.existePorId(id)) {
-			producto.setId(id);
-			return ResponseEntity.ok(servicioProducto.guardar(producto));
-		} else {
-			return ResponseEntity.notFound().build();
+	public ResponseEntity<ProductoDTO> editarProducto(@RequestBody ProductoDTO productoDTO, @PathVariable Long id) {
+		if (!servicioProducto.existePorId(id)) {
+			throw new ProductoNoEncontradoException(id);
 		}
+		Producto producto = convertidor.convertirProductoDtoAProducto(productoDTO);
+		servicioProducto.guardar(producto);
+		return ResponseEntity.ok(productoDTO);
+
 	}
 
 	@DeleteMapping("/producto/{id}")
 	public ResponseEntity<Producto> borrarProducto(@PathVariable Long id) {
-		if (servicioProducto.existePorId(id)) {
-			servicioProducto.borrar(servicioProducto.buscarPorId(id));
-			return ResponseEntity.noContent().build();
-		} else {
-			return ResponseEntity.notFound().build();
-		}
+		servicioProducto.borrar(servicioProducto.buscarPorId(id));
+		return ResponseEntity.noContent().build();
 	}
-
+	
 }
