@@ -12,7 +12,7 @@ import com.martiniriarte.error.ApiError;
 import com.martiniriarte.error.ProductoNoEncontradoException;
 
 @RestControllerAdvice
-public class ControladorGlobalError extends ResponseEntityExceptionHandler{
+public class GlobalErrorControlador extends ResponseEntityExceptionHandler{
 
 	@ExceptionHandler(ProductoNoEncontradoException.class)
 	public ResponseEntity<ApiError> handleProductoNoEncontrado(ProductoNoEncontradoException exception) {
