@@ -6,8 +6,8 @@ import java.util.List;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import com.martiniriarte.dto.ProductoDTO;
 import com.martiniriarte.dto.DetalleProductoDTO;
+import com.martiniriarte.dto.ProductoDTO;
 import com.martiniriarte.modelo.Producto;
 
 import lombok.RequiredArgsConstructor;
@@ -21,11 +21,11 @@ public class ServicioConvertidorProductoDTO {
 	public DetalleProductoDTO convertirADto(Producto producto) {
 		return modelMapper.map(producto, DetalleProductoDTO.class);
 	}
-	
+
 	public Producto convertirProductoDtoAProducto(ProductoDTO productoDTO) {
 		return modelMapper.map(productoDTO, Producto.class);
 	}
-	
+
 	public Producto convertirDetalleProductoDtoAProducto(DetalleProductoDTO detalleProductoDTO) {
 		return modelMapper.map(detalleProductoDTO, Producto.class);
 	}
@@ -38,5 +38,5 @@ public class ServicioConvertidorProductoDTO {
 		}
 		return productosDTO;
 	}
-	
+
 }

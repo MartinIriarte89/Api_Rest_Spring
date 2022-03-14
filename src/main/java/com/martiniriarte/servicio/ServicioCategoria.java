@@ -4,17 +4,12 @@ import org.springframework.stereotype.Service;
 
 import com.martiniriarte.modelo.Categoria;
 import com.martiniriarte.persistencia.CategoriaDAO;
-
-import lombok.RequiredArgsConstructor;
+import com.martiniriarte.servicio.base.ServicioBase;
 
 @Service
-@RequiredArgsConstructor
-public class ServicioCategoria {
+public class ServicioCategoria extends ServicioBase<Categoria, Long, CategoriaDAO> {
 
-	private final CategoriaDAO categoriaDAO;
-	
-	public Categoria buscarPorId(long id) {
-		return categoriaDAO.findById(id).orElse(null);
+	public ServicioCategoria(CategoriaDAO repositorio) {
+		super(repositorio);
 	}
-	
 }

@@ -2,6 +2,11 @@ package com.martiniriarte.controlador;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,15 +20,18 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.martiniriarte.dto.DetalleProductoDTO;
 import com.martiniriarte.dto.ProductoDTO;
 import com.martiniriarte.error.ApiError;
+import com.martiniriarte.error.PaginaNoEncontradaExeption;
 import com.martiniriarte.error.ProductoNoEncontradoException;
 import com.martiniriarte.modelo.Producto;
 import com.martiniriarte.servicio.ServicioAlmacenamiento;
 import com.martiniriarte.servicio.ServicioConvertidorProductoDTO;
 import com.martiniriarte.servicio.ServicioProducto;
+import com.martiniriarte.util.paginacion.PaginacionLinks;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -38,39 +46,45 @@ public class ProductoControlador {
 	private final ServicioProducto servicioProducto;
 	private final ServicioConvertidorProductoDTO convertidor;
 	private final ServicioAlmacenamiento servicioAlmacenamiento;
+	private final PaginacionLinks paginacionLinks;
 
 	@ApiOperation(value = "Obtener todos los productos", notes = "Provee un mecanismo para obtener todos los datos de todos los productos")
-	@ApiResponses(value = { 
-			@ApiResponse(code = 200, message = "OK", response = List.class),
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "OK", response = List.class),
 			@ApiResponse(code = 404, message = "Not Found", response = ApiError.class),
 			@ApiResponse(code = 500, message = "Internal Server Error", response = ApiError.class) })
 	@GetMapping("/producto")
-	public ResponseEntity<List<DetalleProductoDTO>> obtenerTodos() {
-		List<Producto> productos = servicioProducto.buscarTodos();
+
+	public ResponseEntity<List<DetalleProductoDTO>> obtenerTodos(
+			@PageableDefault(size = 10, page = 0) Pageable pageable, HttpServletRequest request) {
+		Page<Producto> productos = servicioProducto.buscarTodos(pageable);
 		if (productos.isEmpty()) {
-			return ResponseEntity.notFound().build();
+			throw new PaginaNoEncontradaExeption(pageable.getPageNumber());
 		} else {
-			return ResponseEntity.ok(convertidor.convertirAListDto(productos));
+
+			UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(request.getRequestURL().toString());
+
+			return ResponseEntity.ok().header("link", paginacionLinks.crearLinkHeader(productos, builder))
+					.body(convertidor.convertirAListDto(productos.getContent()));
 		}
 	}
 
 	@ApiOperation(value = "Obtener un producto por su id", notes = "Provee un mecanismo para obtener todos los datos de un producto por su id")
-	@ApiResponses(value = { 
-			@ApiResponse(code = 200, message = "OK", response = DetalleProductoDTO.class),
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "OK", response = DetalleProductoDTO.class),
 			@ApiResponse(code = 404, message = "Not Found", response = ApiError.class),
 			@ApiResponse(code = 500, message = "Internal Server Error", response = ApiError.class) })
 	@GetMapping("/producto/{id}")
+
 	public ResponseEntity<DetalleProductoDTO> obtenerUno(
 			@ApiParam(value = "Id del producto", required = true, type = "Long") @PathVariable Long id) {
-		return ResponseEntity.ok(convertidor.convertirADto(servicioProducto.buscarPorId(id)));
+		Producto producto = servicioProducto.buscarPorId(id).orElseThrow(() -> new ProductoNoEncontradoException(id));
+		return ResponseEntity.ok(convertidor.convertirADto(producto));
 	}
 
-
 	@ApiOperation(value = "Crear un producto", notes = "Provee un mecanismo para crear un nuevo producto")
-	@ApiResponses(value = { 
-			@ApiResponse(code = 201, message = "Created", response = DetalleProductoDTO.class),
+	@ApiResponses(value = { @ApiResponse(code = 201, message = "Created", response = DetalleProductoDTO.class),
 			@ApiResponse(code = 500, message = "Internal Server Error", response = ApiError.class) })
 	@PostMapping(value = "/producto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+
 	public ResponseEntity<DetalleProductoDTO> nuevoProducto(
 			@ApiParam(value = "Json con los datos para crear un Producto", required = true, type = "productoDTO") @RequestPart("productoDTO") ProductoDTO productoDTO,
 			@ApiParam(value = "Archivo de imagen", required = false, type = "MultipartFile") @RequestPart("file") MultipartFile file) {
@@ -90,16 +104,15 @@ public class ProductoControlador {
 		return ResponseEntity.status(HttpStatus.CREATED).body(convertidor.convertirADto(producto));
 	}
 
-	
 	@ApiOperation(value = "Editar un producto por su id", notes = "Provee un mecanismo para editar todos los datos de un producto por su id")
-	@ApiResponses(value = { 
-			@ApiResponse(code = 201, message = "Created", response = ProductoDTO.class),
+	@ApiResponses(value = { @ApiResponse(code = 201, message = "Created", response = ProductoDTO.class),
 			@ApiResponse(code = 404, message = "Not Found", response = ApiError.class),
 			@ApiResponse(code = 500, message = "Internal Server Error", response = ApiError.class) })
 	@PutMapping("/producto/{id}")
+
 	public ResponseEntity<ProductoDTO> editarProducto(
-			@ApiParam(value = "Json para editar el producto", required = true, type = "productoDTO")@RequestBody ProductoDTO productoDTO, 
-			@ApiParam(value = "Id del producto a editar", required = true, type = "long")@PathVariable Long id) {
+			@ApiParam(value = "Json para editar el producto", required = true, type = "productoDTO") @RequestBody ProductoDTO productoDTO,
+			@ApiParam(value = "Id del producto a editar", required = true, type = "long") @PathVariable Long id) {
 		if (!servicioProducto.existePorId(id)) {
 			throw new ProductoNoEncontradoException(id);
 		}
@@ -110,14 +123,15 @@ public class ProductoControlador {
 	}
 
 	@ApiOperation(value = "Eliminar un producto por su id", notes = "Provee un mecanismo para eliminar un producto por su id")
-	@ApiResponses(value = { 
-			@ApiResponse(code = 204, message = "No Content", response = Producto.class),
+	@ApiResponses(value = { @ApiResponse(code = 204, message = "No Content", response = Producto.class),
 			@ApiResponse(code = 404, message = "Not Found", response = ApiError.class),
 			@ApiResponse(code = 500, message = "Internal Server Error", response = ApiError.class) })
 	@DeleteMapping("/producto/{id}")
+
 	public ResponseEntity<Producto> borrarProducto(
-			@ApiParam(value = "Id del producto", required = true, type = "long")@PathVariable Long id) {
-		servicioProducto.borrar(servicioProducto.buscarPorId(id));
+			@ApiParam(value = "Id del producto", required = true, type = "long") @PathVariable Long id) {
+		Producto producto = servicioProducto.buscarPorId(id).orElseThrow(() -> new ProductoNoEncontradoException(id));
+		servicioProducto.borrar(producto);
 		return ResponseEntity.noContent().build();
 	}
 }
