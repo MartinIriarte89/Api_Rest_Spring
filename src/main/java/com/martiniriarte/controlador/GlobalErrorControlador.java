@@ -9,13 +9,14 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.martiniriarte.error.ApiError;
+import com.martiniriarte.error.BuscarProductoSinResultadoException;
 import com.martiniriarte.error.PaginaNoEncontradaExeption;
 import com.martiniriarte.error.ProductoNoEncontradoException;
 
 @RestControllerAdvice
 public class GlobalErrorControlador extends ResponseEntityExceptionHandler{
 
-	@ExceptionHandler(ProductoNoEncontradoException.class)
+	@ExceptionHandler({ProductoNoEncontradoException.class, BuscarProductoSinResultadoException.class})
 	public ResponseEntity<ApiError> handleProductoNoEncontrado(ProductoNoEncontradoException exception) {
 		ApiError apiError = ApiError.builder().estado(HttpStatus.NOT_FOUND)
 											  .mensaje(exception.getMessage())

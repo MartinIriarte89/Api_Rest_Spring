@@ -1,8 +1,8 @@
 package com.martiniriarte.error;
 
 public class AlmacenamientoException extends RuntimeException {
-
-	private static final long serialVersionUID = -5502351264978098291L;
+	
+	private static final long serialVersionUID = -3316361048062749868L;
 
 	public AlmacenamientoException(String message) {
 		super(message);

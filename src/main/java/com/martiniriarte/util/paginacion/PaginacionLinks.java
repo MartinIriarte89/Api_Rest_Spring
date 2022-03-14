@@ -12,42 +12,42 @@ public class PaginacionLinks {
 		linkHeader.append("");
 		
 		if (page.hasNext()) {
-			String uri = constructUri(page.getNumber()+1, page.getSize(), uriBuilder);			
-			linkHeader.append(buildLinkHeader(uri, "next"));
+			String uri = construirUri(page.getNumber()+1, page.getSize(), uriBuilder);			
+			linkHeader.append(construirLinkHeader(uri, "next"));
 		}
 		
 		if (page.hasPrevious()) {
-			String uri = constructUri(page.getNumber()-1, page.getSize(), uriBuilder);
-			appendCommaIfNecessary(linkHeader);
-			linkHeader.append(buildLinkHeader(uri, "prev"));
+			String uri = construirUri(page.getNumber()-1, page.getSize(), uriBuilder);
+			agregarComaSiEsNecesario(linkHeader);
+			linkHeader.append(construirLinkHeader(uri, "prev"));
 		}
 		
 		if (!page.isFirst()) {
-			String uri = constructUri(0, page.getSize(), uriBuilder);
-			appendCommaIfNecessary(linkHeader);
-			linkHeader.append(buildLinkHeader(uri, "first"));			
+			String uri = construirUri(0, page.getSize(), uriBuilder);
+			agregarComaSiEsNecesario(linkHeader);
+			linkHeader.append(construirLinkHeader(uri, "first"));			
 		}
 		
 		if (!page.isLast()) {
-			String uri = constructUri(page.getTotalPages()-1, page.getSize(), uriBuilder);
-			appendCommaIfNecessary(linkHeader);
-			linkHeader.append(buildLinkHeader(uri, "last"));			
+			String uri = construirUri(page.getTotalPages()-1, page.getSize(), uriBuilder);
+			agregarComaSiEsNecesario(linkHeader);
+			linkHeader.append(construirLinkHeader(uri, "last"));			
 		}
 		
 		
 		return linkHeader.toString();
 	}
 	
-	private String constructUri(int newPageNumber, int size, UriComponentsBuilder uriBuilder) {
+	private String construirUri(int newPageNumber, int size, UriComponentsBuilder uriBuilder) {
 		return uriBuilder.replaceQueryParam("page", newPageNumber ).replaceQueryParam("size", size).build().encode().toUriString();
 	}
 	
 	
-	private String buildLinkHeader(final String uri, final String rel) {
+	private String construirLinkHeader(final String uri, final String rel) {
 		return "<" + uri + ">; rel=\"" + rel + "\"";
 	}
 	
-	private void appendCommaIfNecessary(final StringBuilder linkHeader) {
+	private void agregarComaSiEsNecesario(final StringBuilder linkHeader) {
         if (linkHeader.length() > 0) {
             linkHeader.append(", ");
         }
