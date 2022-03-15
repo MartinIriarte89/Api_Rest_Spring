@@ -1,10 +1,16 @@
 package com.martiniriarte.dto;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class DetalleProductoDTO {
 	
 	@ApiModelProperty(value = "Id del producto", dataType = "long", example = "1", position = 1)

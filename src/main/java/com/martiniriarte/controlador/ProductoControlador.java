@@ -25,6 +25,7 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.martiniriarte.dto.DetalleProductoDTO;
+import com.martiniriarte.dto.EditarProductoDTO;
 import com.martiniriarte.dto.ProductoDTO;
 import com.martiniriarte.error.ApiError;
 import com.martiniriarte.error.BuscarProductoSinResultadoException;
@@ -87,7 +88,7 @@ public class ProductoControlador {
 		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(request.getRequestURL().toString());
 
 		return ResponseEntity.ok().header("link", paginacionLinks.crearLinkHeader(productos, builder))
-				.body(convertidor.convertirAListDto(productos.getContent()));
+				.body(convertidor.convertirADtoConLombok(productos.getContent()));
 	}
 
 	@ApiOperation(value = "Obtener un producto por su id", notes = "Provee un mecanismo para obtener todos los datos de un producto por su id")
@@ -135,15 +136,16 @@ public class ProductoControlador {
 			@ApiResponse(code = 500, message = "Internal Server Error", response = ApiError.class) })
 	
 	@PutMapping("/producto/{id}")
-	public ResponseEntity<ProductoDTO> editarProducto(
-			@ApiParam(value = "Json para editar el producto", required = true, type = "productoDTO") @RequestBody ProductoDTO productoDTO,
+	public ResponseEntity<Producto> editarProducto(
+			@ApiParam(value = "Json para editar el producto", required = true, type = "editarProductoDTO") @RequestBody EditarProductoDTO editarProductoDTO,
 			@ApiParam(value = "Id del producto a editar", required = true, type = "long") @PathVariable Long id) {
 		if (!servicioProducto.existePorId(id)) {
 			throw new ProductoNoEncontradoException(id);
 		}
-		Producto producto = convertidor.convertirProductoDtoAProducto(productoDTO);
+		Producto producto = convertidor.convertirEditarProductoDtoAProducto(editarProductoDTO);
+		producto.setId(id);
 		servicioProducto.guardar(producto);
-		return ResponseEntity.ok(productoDTO);
+		return ResponseEntity.ok(producto);
 
 	}
 
