@@ -11,25 +11,17 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import com.martiniriarte.error.ApiError;
 import com.martiniriarte.error.BuscarProductoSinResultadoException;
 import com.martiniriarte.error.PaginaNoEncontradaExeption;
+import com.martiniriarte.error.PedidoNoEncontradoExcepcion;
 import com.martiniriarte.error.ProductoNoEncontradoException;
 
 @RestControllerAdvice
-public class GlobalErrorControlador extends ResponseEntityExceptionHandler{
+public class GlobalErrorControlador extends ResponseEntityExceptionHandler {
 
-	@ExceptionHandler({ProductoNoEncontradoException.class, BuscarProductoSinResultadoException.class})
+	@ExceptionHandler({ ProductoNoEncontradoException.class, BuscarProductoSinResultadoException.class,
+			PedidoNoEncontradoExcepcion.class, PaginaNoEncontradaExeption.class })
 	public ResponseEntity<ApiError> handleProductoNoEncontrado(ProductoNoEncontradoException exception) {
 		ApiError apiError = ApiError.builder().estado(HttpStatus.NOT_FOUND)
-											  .mensaje(exception.getMessage())
-											  .build();
-
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
-	}
-	
-	@ExceptionHandler(PaginaNoEncontradaExeption.class)
-	public ResponseEntity<ApiError> handlePaginaNoEncontrada(PaginaNoEncontradaExeption exception) {
-		ApiError apiError = ApiError.builder().estado(HttpStatus.NOT_FOUND)
-											  .mensaje(exception.getMessage())
-											  .build();
+												.mensaje(exception.getMessage()).build();
 
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
 	}
@@ -38,9 +30,8 @@ public class GlobalErrorControlador extends ResponseEntityExceptionHandler{
 	protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers,
 			HttpStatus status, WebRequest request) {
 		ApiError apiError = ApiError.builder().estado(status)
-											  .mensaje(ex.getMessage())
-											  .build();
+												.mensaje(ex.getMessage()).build();
 		return ResponseEntity.status(status).headers(headers).body(apiError);
 	}
-	
+
 }

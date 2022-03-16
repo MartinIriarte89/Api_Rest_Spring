@@ -33,7 +33,7 @@ public class Producto {
 	private String imagen;
 	
 	@ApiModelProperty(value = "Categoria del producto", dataType = "Categoria",  position = 5)
-	@ManyToOne
+	@ManyToOne()
 	@JoinColumn(name="categoria_id")
 	private Categoria categoria;
 
