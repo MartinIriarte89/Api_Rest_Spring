@@ -19,10 +19,14 @@ public class ServicioConvertidorProductoDTO {
 
 	private final ModelMapper modelMapper;
 	
-	public DetalleProductoDTO convertirADto(Producto producto) {
+	public DetalleProductoDTO convertirADtoDetalle(Producto producto) {
 		return modelMapper.map(producto, DetalleProductoDTO.class);
 	}
 
+	public ProductoDTO convertirADto(Producto producto) {
+		return modelMapper.map(producto, ProductoDTO.class);
+	}
+	
 	public Producto convertirProductoDtoAProducto(ProductoDTO productoDTO) {
 		return modelMapper.map(productoDTO, Producto.class);
 	}
@@ -35,8 +39,8 @@ public class ServicioConvertidorProductoDTO {
 		return modelMapper.map(detalleProductoDTO, Producto.class);
 	}
 
-	public List<DetalleProductoDTO> convertirAListDto(List<Producto> productos) {
-		List<DetalleProductoDTO> productosDTO = new ArrayList<>();
+	public List<ProductoDTO> convertirAListDto(List<Producto> productos) {
+		List<ProductoDTO> productosDTO = new ArrayList<>();
 
 		for (Producto producto : productos) {
 			productosDTO.add(convertirADto(producto));

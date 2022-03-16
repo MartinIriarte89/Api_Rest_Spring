@@ -24,9 +24,10 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.martiniriarte.dto.DetalleProductoDTO;
-import com.martiniriarte.dto.EditarProductoDTO;
 import com.martiniriarte.dto.ProductoDTO;
+import com.martiniriarte.dto.views.ProductoViews;
 import com.martiniriarte.error.ApiError;
 import com.martiniriarte.error.BuscarProductoSinResultadoException;
 import com.martiniriarte.error.ProductoNoEncontradoException;
@@ -74,8 +75,9 @@ public class ProductoControlador {
 			@ApiResponse(code = 404, message = "Not Found", response = ApiError.class),
 			@ApiResponse(code = 500, message = "Internal Server Error", response = ApiError.class) })
 	
+	@JsonView(ProductoViews.Dto.class)
 	@GetMapping("/producto")
-	public ResponseEntity<List<DetalleProductoDTO>> obtenerTodosFiltrado(
+	public ResponseEntity<List<ProductoDTO>> obtenerTodosFiltrado(
 			@ApiParam(value = "Cadena para filtrar por nombre del producto", required = false, type = "String") @RequestParam("nombre") Optional<String> nombre,
 			@ApiParam(value = "Precio maximo para filtrar el producto", required = false, type = "float")@RequestParam("precio") Optional<Float> precio,
 			@PageableDefault(size = 10, page = 0) Pageable pageable, HttpServletRequest request){
@@ -88,7 +90,7 @@ public class ProductoControlador {
 		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(request.getRequestURL().toString());
 
 		return ResponseEntity.ok().header("link", paginacionLinks.crearLinkHeader(productos, builder))
-				.body(convertidor.convertirADtoConLombok(productos.getContent()));
+				.body(convertidor.convertirAListDto(productos.getContent()));
 	}
 
 	@ApiOperation(value = "Obtener un producto por su id", notes = "Provee un mecanismo para obtener todos los datos de un producto por su id")
@@ -101,7 +103,7 @@ public class ProductoControlador {
 	public ResponseEntity<DetalleProductoDTO> obtenerUno(
 			@ApiParam(value = "Id del producto", required = true, type = "Long") @PathVariable Long id) {
 		Producto producto = servicioProducto.buscarPorId(id).orElseThrow(() -> new ProductoNoEncontradoException(id));
-		return ResponseEntity.ok(convertidor.convertirADto(producto));
+		return ResponseEntity.ok(convertidor.convertirADtoDetalle(producto));
 	}
 
 	@ApiOperation(value = "Crear un producto", notes = "Provee un mecanismo para crear un nuevo producto")
@@ -109,6 +111,7 @@ public class ProductoControlador {
 			@ApiResponse(code = 201, message = "Created", response = DetalleProductoDTO.class),
 			@ApiResponse(code = 500, message = "Internal Server Error", response = ApiError.class) })
 	
+	@JsonView(ProductoViews.DtoCrear.class)
 	@PostMapping(value = "/producto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<DetalleProductoDTO> nuevoProducto(
 			@ApiParam(value = "Json con los datos para crear un Producto", required = true, type = "productoDTO") @RequestPart("productoDTO") ProductoDTO productoDTO,
@@ -126,7 +129,7 @@ public class ProductoControlador {
 		productoDTO.setImagen(urlImagen);
 		Producto producto = convertidor.convertirProductoDtoAProducto(productoDTO);
 		producto = servicioProducto.guardar(producto);
-		return ResponseEntity.status(HttpStatus.CREATED).body(convertidor.convertirADto(producto));
+		return ResponseEntity.status(HttpStatus.CREATED).body(convertidor.convertirADtoDetalle(producto));
 	}
 
 	@ApiOperation(value = "Editar un producto por su id", notes = "Provee un mecanismo para editar todos los datos de un producto por su id")
@@ -135,14 +138,15 @@ public class ProductoControlador {
 			@ApiResponse(code = 404, message = "Not Found", response = ApiError.class),
 			@ApiResponse(code = 500, message = "Internal Server Error", response = ApiError.class) })
 	
+	@JsonView(ProductoViews.DtoCrear.class)
 	@PutMapping("/producto/{id}")
 	public ResponseEntity<Producto> editarProducto(
-			@ApiParam(value = "Json para editar el producto", required = true, type = "editarProductoDTO") @RequestBody EditarProductoDTO editarProductoDTO,
+			@ApiParam(value = "Json para editar el producto", required = true, type = "editarProductoDTO") @RequestBody ProductoDTO productoDTO,
 			@ApiParam(value = "Id del producto a editar", required = true, type = "long") @PathVariable Long id) {
 		if (!servicioProducto.existePorId(id)) {
 			throw new ProductoNoEncontradoException(id);
 		}
-		Producto producto = convertidor.convertirEditarProductoDtoAProducto(editarProductoDTO);
+		Producto producto = convertidor.convertirProductoDtoAProducto(productoDTO);
 		producto.setId(id);
 		servicioProducto.guardar(producto);
 		return ResponseEntity.ok(producto);
