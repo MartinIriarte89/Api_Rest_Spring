@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.martiniriarte.error.PedidoNoEncontradoExcepcion;
+import com.martiniriarte.error.exceptions.PedidoNoEncontradoExcepcion;
 import com.martiniriarte.modelo.Pedido;
 import com.martiniriarte.servicio.ServicioPedido;
 import com.martiniriarte.util.paginacion.PaginacionLinks;

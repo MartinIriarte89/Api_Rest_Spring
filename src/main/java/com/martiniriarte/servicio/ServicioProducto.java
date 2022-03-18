@@ -13,14 +13,14 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.martiniriarte.modelo.Producto;
-import com.martiniriarte.persistencia.ProductoDAO;
+import com.martiniriarte.repositorio.RepositorioProducto;
 import com.martiniriarte.servicio.base.ServicioBase;
 
 @Service
 
-public class ServicioProducto extends ServicioBase<Producto, Long, ProductoDAO> {
+public class ServicioProducto extends ServicioBase<Producto, Long, RepositorioProducto> {
 
-	public ServicioProducto(ProductoDAO repositorio) {
+	public ServicioProducto(RepositorioProducto repositorio) {
 		super(repositorio);
 	}
 

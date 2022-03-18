@@ -1,4 +1,4 @@
-package com.martiniriarte.error;
+package com.martiniriarte.error.exceptions;
 
 public class AlmacenamientoArchivoNoEncontradoException extends AlmacenamientoException {
 

@@ -1,19 +1,18 @@
 package com.martiniriarte.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Setter
 @Getter
-@Builder
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EditarProductoDTO {
-	
-	private String nombre;
-	private float precio;
-	
+public class CrearUsuarioDto {
+
+	private String nombreUsuario;
+	private String urlAvatar;
+	private String contrasena;
+	private String contrasena2;
 }

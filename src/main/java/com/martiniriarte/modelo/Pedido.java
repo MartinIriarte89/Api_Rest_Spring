@@ -9,6 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import org.springframework.data.annotation.CreatedDate;
@@ -35,7 +37,9 @@ public class Pedido {
 	@GeneratedValue
 	private Long id;
 
-	private String cliente;
+	@ManyToOne
+	@JoinColumn(name="cliente_id")
+	private UsuarioEntidad cliente;
 
 	@CreatedDate
 	private LocalDateTime fecha;
