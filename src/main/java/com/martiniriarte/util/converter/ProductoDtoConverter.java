@@ -6,9 +6,9 @@ import java.util.List;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
-import com.martiniriarte.dto.DetalleProductoDto;
+import com.martiniriarte.dto.GetProductoDto;
 import com.martiniriarte.dto.EditarProductoDto;
-import com.martiniriarte.dto.ProductoDto;
+import com.martiniriarte.dto.CrearProductoDto;
 import com.martiniriarte.modelo.Producto;
 
 import lombok.RequiredArgsConstructor;
@@ -19,31 +19,35 @@ public class ProductoDtoConverter {
 
 	private final ModelMapper modelMapper;
 	
-	public DetalleProductoDto convertirADtoDetalle(Producto producto) {
-		return modelMapper.map(producto, DetalleProductoDto.class);
+	public GetProductoDto convertirProductoAProductoDto(Producto producto) {
+		return modelMapper.map(producto, GetProductoDto.class);
 	}
 
-	public ProductoDto convertirADto(Producto producto) {
-		return modelMapper.map(producto, ProductoDto.class);
+	public CrearProductoDto convertirProductoACrearProductoDto(Producto producto) {
+		return modelMapper.map(producto, CrearProductoDto.class);
 	}
 	
-	public Producto convertirProductoDtoAProducto(ProductoDto productoDTO) {
-		return modelMapper.map(productoDTO, Producto.class);
+	public EditarProductoDto convertirProductoAEditarProductoDto(Producto producto) {
+		return modelMapper.map(producto, EditarProductoDto.class);
+	}
+	
+	public Producto convertirCrearProductoDtoAProducto(CrearProductoDto crearProductoDto) {
+		return modelMapper.map(crearProductoDto, Producto.class);
 	}
 	
 	public Producto convertirEditarProductoDtoAProducto(EditarProductoDto editarProductoDTO) {
 		return modelMapper.map(editarProductoDTO, Producto.class);
 	}
 
-	public Producto convertirDetalleProductoDtoAProducto(DetalleProductoDto detalleProductoDTO) {
-		return modelMapper.map(detalleProductoDTO, Producto.class);
+	public Producto convertirProductoDtoAProducto(GetProductoDto productoDto) {
+		return modelMapper.map(productoDto, Producto.class);
 	}
 
-	public List<ProductoDto> convertirAListDto(List<Producto> productos) {
-		List<ProductoDto> productosDTO = new ArrayList<>();
+	public List<GetProductoDto> convertirAListDto(List<Producto> productos) {
+		List<GetProductoDto> productosDTO = new ArrayList<>();
 
 		for (Producto producto : productos) {
-			productosDTO.add(convertirADto(producto));
+			productosDTO.add(convertirProductoAProductoDto(producto));
 		}
 		return productosDTO;
 	}

@@ -10,6 +10,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import com.martiniriarte.error.ApiError;
 import com.martiniriarte.error.exceptions.BuscarProductoSinResultadoException;
+import com.martiniriarte.error.exceptions.CrearLoteException;
+import com.martiniriarte.error.exceptions.LoteNoEncontradoException;
 import com.martiniriarte.error.exceptions.NuevoUsuarioConDiferenteContrasenaException;
 import com.martiniriarte.error.exceptions.PaginaNoEncontradaExeption;
 import com.martiniriarte.error.exceptions.PedidoNoEncontradoExcepcion;
@@ -20,14 +22,15 @@ import com.martiniriarte.error.exceptions.UsuariosNoEncontradosException;
 public class GlobalAdviceControlador extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler({ ProductoNoEncontradoException.class, BuscarProductoSinResultadoException.class,
-			PedidoNoEncontradoExcepcion.class, PaginaNoEncontradaExeption.class, UsuariosNoEncontradosException.class })
+			PedidoNoEncontradoExcepcion.class, PaginaNoEncontradaExeption.class, UsuariosNoEncontradosException.class,
+			LoteNoEncontradoException.class})
 	public ResponseEntity<ApiError> handleNoEncontrado(ProductoNoEncontradoException exception) {
 		ApiError apiError = ApiError.builder().estado(HttpStatus.NOT_FOUND).mensaje(exception.getMessage()).build();
 
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
 	}
 
-	@ExceptionHandler(NuevoUsuarioConDiferenteContrasenaException.class)
+	@ExceptionHandler({NuevoUsuarioConDiferenteContrasenaException.class, CrearLoteException.class})
 	public ResponseEntity<ApiError> handleNeNuevoUsuarioError(Exception ex) {
 		return construirErrorResponseEntity(HttpStatus.BAD_REQUEST, ex.getMessage());
 	}
@@ -40,11 +43,10 @@ public class GlobalAdviceControlador extends ResponseEntityExceptionHandler {
 	}
 
 	private ResponseEntity<ApiError> construirErrorResponseEntity(HttpStatus status, String message) {
-		return ResponseEntity.status(status)
-					.body(ApiError.builder()
-							.estado(status)
-							.mensaje(message)
-							.build());
+		return ResponseEntity.status(status).body(ApiError.builder()
+															.estado(status)
+															.mensaje(message)
+															.build());
 	}
 
 }

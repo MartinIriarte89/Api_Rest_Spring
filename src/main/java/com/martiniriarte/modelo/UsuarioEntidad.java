@@ -21,10 +21,12 @@ import com.martiniriarte.util.enumerados.RolUsuario;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
 @AllArgsConstructor
+@NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public class UsuarioEntidad {
 

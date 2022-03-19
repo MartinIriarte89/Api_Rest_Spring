@@ -25,8 +25,9 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.martiniriarte.dto.DetalleProductoDto;
-import com.martiniriarte.dto.ProductoDto;
+import com.martiniriarte.dto.GetProductoDto;
+import com.martiniriarte.dto.CrearProductoDto;
+import com.martiniriarte.dto.EditarProductoDto;
 import com.martiniriarte.dto.views.ProductoViews;
 import com.martiniriarte.error.ApiError;
 import com.martiniriarte.error.exceptions.BuscarProductoSinResultadoException;
@@ -58,9 +59,9 @@ public class ProductoControlador {
 			@ApiResponse(code = 404, message = "Not Found", response = ApiError.class),
 			@ApiResponse(code = 500, message = "Internal Server Error", response = ApiError.class) })
 	
-	@JsonView(ProductoViews.Dto.class)
+	@JsonView(ProductoViews.DtoConPrecio.class)
 	@GetMapping("/producto")
-	public ResponseEntity<List<ProductoDto>> obtenerTodosFiltrado(
+	public ResponseEntity<List<GetProductoDto>> obtenerTodosFiltrado(
 			@ApiParam(value = "Cadena para filtrar por nombre del producto", required = false, type = "String") @RequestParam("nombre") Optional<String> nombre,
 			@ApiParam(value = "Precio maximo para filtrar el producto", required = false, type = "float")@RequestParam("precio") Optional<Float> precio,
 			@PageableDefault(size = 10, page = 0) Pageable pageable, HttpServletRequest request){
@@ -78,26 +79,27 @@ public class ProductoControlador {
 
 	@ApiOperation(value = "Obtener un producto por su id", notes = "Provee un mecanismo para obtener todos los datos de un producto por su id")
 	@ApiResponses(value = { 
-			@ApiResponse(code = 200, message = "OK", response = DetalleProductoDto.class),
+			@ApiResponse(code = 200, message = "OK", response = GetProductoDto.class),
 			@ApiResponse(code = 404, message = "Not Found", response = ApiError.class),
 			@ApiResponse(code = 500, message = "Internal Server Error", response = ApiError.class) })
 	
+	@JsonView(ProductoViews.DtoConPrecio.class)
 	@GetMapping("/producto/{id}")
-	public ResponseEntity<DetalleProductoDto> obtenerUno(
+	public ResponseEntity<GetProductoDto> obtenerUno(
 			@ApiParam(value = "Id del producto", required = true, type = "Long") @PathVariable Long id) {
 		Producto producto = servicioProducto.buscarPorId(id).orElseThrow(() -> new ProductoNoEncontradoException(id));
-		return ResponseEntity.ok(convertidor.convertirADtoDetalle(producto));
+		return ResponseEntity.ok(convertidor.convertirProductoAProductoDto(producto));
 	}
 
 	@ApiOperation(value = "Crear un producto", notes = "Provee un mecanismo para crear un nuevo producto")
 	@ApiResponses(value = {
-			@ApiResponse(code = 201, message = "Created", response = DetalleProductoDto.class),
+			@ApiResponse(code = 201, message = "Created", response = GetProductoDto.class),
 			@ApiResponse(code = 500, message = "Internal Server Error", response = ApiError.class) })
 	
-	@JsonView(ProductoViews.DtoCrear.class)
+	@JsonView(ProductoViews.Dto.class)
 	@PostMapping(value = "/producto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<DetalleProductoDto> nuevoProducto(
-			@ApiParam(value = "Json con los datos para crear un Producto", required = true, type = "productoDTO") @RequestPart("productoDTO") ProductoDto productoDTO,
+	public ResponseEntity<GetProductoDto> nuevoProducto(
+			@ApiParam(value = "Json con los datos para crear un Producto", required = true, type = "productoDTO") @RequestPart("productoDTO") CrearProductoDto productoDTO,
 			@ApiParam(value = "Archivo de imagen", required = false, type = "MultipartFile") @RequestPart("file") MultipartFile file) {
 
 		String urlImagen = null;
@@ -110,30 +112,29 @@ public class ProductoControlador {
 		}
 
 		productoDTO.setImagen(urlImagen);
-		Producto producto = convertidor.convertirProductoDtoAProducto(productoDTO);
+		Producto producto = convertidor.convertirCrearProductoDtoAProducto(productoDTO);
 		producto = servicioProducto.guardar(producto);
-		return ResponseEntity.status(HttpStatus.CREATED).body(convertidor.convertirADtoDetalle(producto));
+		return ResponseEntity.status(HttpStatus.CREATED).body(convertidor.convertirProductoAProductoDto(producto));
 	}
 
 	@ApiOperation(value = "Editar un producto por su id", notes = "Provee un mecanismo para editar todos los datos de un producto por su id")
 	@ApiResponses(value = {
-			@ApiResponse(code = 201, message = "Created", response = ProductoDto.class),
+			@ApiResponse(code = 201, message = "Created", response = CrearProductoDto.class),
 			@ApiResponse(code = 404, message = "Not Found", response = ApiError.class),
 			@ApiResponse(code = 500, message = "Internal Server Error", response = ApiError.class) })
 	
-	@JsonView(ProductoViews.DtoCrear.class)
+	
 	@PutMapping("/producto/{id}")
 	public ResponseEntity<Producto> editarProducto(
-			@ApiParam(value = "Json para editar el producto", required = true, type = "editarProductoDTO") @RequestBody ProductoDto productoDTO,
+			@ApiParam(value = "Json para editar el producto", required = true, type = "editarProductoDTO") @RequestBody EditarProductoDto productoDTO,
 			@ApiParam(value = "Id del producto a editar", required = true, type = "long") @PathVariable Long id) {
 		if (!servicioProducto.existePorId(id)) {
 			throw new ProductoNoEncontradoException(id);
 		}
-		Producto producto = convertidor.convertirProductoDtoAProducto(productoDTO);
+		Producto producto = convertidor.convertirEditarProductoDtoAProducto(productoDTO);
 		producto.setId(id);
 		servicioProducto.guardar(producto);
 		return ResponseEntity.ok(producto);
-
 	}
 
 	@ApiOperation(value = "Eliminar un producto por su id", notes = "Provee un mecanismo para eliminar un producto por su id")

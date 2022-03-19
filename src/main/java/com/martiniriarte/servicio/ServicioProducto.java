@@ -67,4 +67,8 @@ public class ServicioProducto extends ServicioBase<Producto, Long, RepositorioPr
 		return this.repositorio.findAll(ambas, pageable);
 
 	}
+	
+	public Optional<Producto> findByIdConLotes(Long id) {
+		return repositorio.findByIdJoinFetch(id);
+	}
 }
