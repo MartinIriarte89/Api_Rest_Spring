@@ -60,13 +60,13 @@ public class Pedido {
 	 * Métodos helper
 	 */
 	
-	public void agregarLineaPedido(LineaPedido lp) {
-		lineas.add(lp);
-		lp.setPedido(this);
+	public void agregarLineaPedido(LineaPedido lineaPedido) {
+		lineas.add(lineaPedido);
+		lineaPedido.setPedido(this);
 	}
 	
-	public void elimimarLineaPedido(LineaPedido lp) {
-		lineas.remove(lp);
-		lp.setPedido(null);
+	public void elimimarLineaPedido(LineaPedido lineaPedido) {
+		lineas.remove(lineaPedido);
+		lineaPedido.setPedido(null);
 	}
 }
