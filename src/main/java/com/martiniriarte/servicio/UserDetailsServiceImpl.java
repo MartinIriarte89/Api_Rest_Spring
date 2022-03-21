@@ -13,9 +13,11 @@ import org.springframework.stereotype.Service;
 import com.martiniriarte.modelo.UsuarioEntidad;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service("UserDetailsService")
 @RequiredArgsConstructor
+@Slf4j
 public class UserDetailsServiceImpl implements UserDetailsService {
 
 	private final ServicioUsuario servicioUsuario;
@@ -27,6 +29,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 		Collection<SimpleGrantedAuthority> authorities = usuario.getRoles().stream()
 				.map(rol -> new SimpleGrantedAuthority(rol.name())).collect(Collectors.toList());
+		
+		log.info(authorities.toString());
 
 		return new User(usuario.getNombreUsuario(), usuario.getContrasena(), authorities);
 	}

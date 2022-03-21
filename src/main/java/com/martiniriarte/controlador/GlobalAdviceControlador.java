@@ -23,7 +23,7 @@ public class GlobalAdviceControlador extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler({ ProductoNoEncontradoException.class, BuscarProductoSinResultadoException.class,
 			PedidoNoEncontradoExcepcion.class, PaginaNoEncontradaExeption.class, UsuariosNoEncontradosException.class,
-			LoteNoEncontradoException.class})
+			LoteNoEncontradoException.class, UsuariosNoEncontradosException.class})
 	public ResponseEntity<ApiError> handleNoEncontrado(ProductoNoEncontradoException exception) {
 		ApiError apiError = ApiError.builder().estado(HttpStatus.NOT_FOUND).mensaje(exception.getMessage()).build();
 

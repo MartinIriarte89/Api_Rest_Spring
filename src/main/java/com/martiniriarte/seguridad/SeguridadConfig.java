@@ -19,6 +19,7 @@ public class SeguridadConfig extends WebSecurityConfigurerAdapter {
 		private final CustomBasicAuthenticationEntryPoint customBasicAuthenticationEntryPoint;
 		private final UserDetailsService userDetailsService;
 		private final PasswordEncoder passwordEncoder;
+		private final CustomAccessDeniedHandler accessDeniedHandler;
 		
 		@Override
 		protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -32,7 +33,7 @@ public class SeguridadConfig extends WebSecurityConfigurerAdapter {
 				.authenticationEntryPoint(customBasicAuthenticationEntryPoint)
 				.and()
 				.authorizeRequests()
-					.antMatchers(HttpMethod.GET, "/producto/**", "/lote/**").hasRole("USER")
+					.antMatchers(HttpMethod.GET, "/producto","/producto/**", "/lote/**").hasRole("USER")
 					.antMatchers(HttpMethod.POST, "/producto/**", "/lote/**").hasRole("ADMIN")
 					.antMatchers(HttpMethod.PUT, "/producto/**").hasRole("ADMIN")
 					.antMatchers(HttpMethod.DELETE, "/producto/**").hasRole("ADMIN")
@@ -41,6 +42,8 @@ public class SeguridadConfig extends WebSecurityConfigurerAdapter {
 				.and()
 					.csrf().disable();
 			
+			http.exceptionHandling()
+					.accessDeniedHandler(accessDeniedHandler);
 		}
 		
 		
