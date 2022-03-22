@@ -8,4 +8,7 @@ public class UsuariosNoEncontradosException extends RuntimeException {
 		super("No se encontro la lista de usuarios");
 	}
 	
+	public UsuariosNoEncontradosException(String string) {
+		super(string);
+	}
 }

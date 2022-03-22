@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +25,7 @@ public class SeguridadConfig extends WebSecurityConfigurerAdapter {
 	
 		private final UserDetailsService userDetailsService;
 		private final PasswordEncoder passwordEncoder;
+		private final JwtAuthenticationEntryPoint authenticationEntryPoint;
 		
 		@Override
 		protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -41,7 +43,7 @@ public class SeguridadConfig extends WebSecurityConfigurerAdapter {
 			http
 				.csrf().disable()
 				.exceptionHandling()
-					.authenticationEntryPoint(null)
+					.authenticationEntryPoint(authenticationEntryPoint)
 				.and()
 				.sessionManagement()
 					.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -53,5 +55,7 @@ public class SeguridadConfig extends WebSecurityConfigurerAdapter {
 					.antMatchers(HttpMethod.DELETE, "/producto/**").hasRole("ADMIN")
 					.antMatchers(HttpMethod.POST, "/pedido/**").hasAnyRole("USER","ADMIN")
 					.anyRequest().authenticated();
+			
+			http.addFilterBefore(null, UsernamePasswordAuthenticationFilter.class);
 		}
 }

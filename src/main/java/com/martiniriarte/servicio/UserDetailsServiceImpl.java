@@ -31,4 +31,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		return new User(usuario.getNombreUsuario(), usuario.getContrasena(), authorities);
 	}
 
+	public UserDetails cargarUsuarioPorId(long id) throws UsernameNotFoundException {
+		UsuarioEntidad usuario = servicioUsuario.buscarPorId(id)
+				.orElseThrow(() -> new UsernameNotFoundException("Usuario con el ID:" + id + " no encontrado."));
+
+		Collection<SimpleGrantedAuthority> authorities = usuario.getRoles().stream()
+				.map(rol -> new SimpleGrantedAuthority(rol.name())).collect(Collectors.toList());
+
+		return new User(usuario.getNombreUsuario(), usuario.getContrasena(), authorities);
+	}
+
 }

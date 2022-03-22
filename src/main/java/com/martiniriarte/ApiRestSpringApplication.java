@@ -21,6 +21,4 @@ public class ApiRestSpringApplication {
 			servicioAlmacenamiento.init();
 		};
 	}
-	//Hola
-
 }
