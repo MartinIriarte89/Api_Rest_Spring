@@ -17,8 +17,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.martiniriarte.modelo.UsuarioEntidad;
-import com.martiniriarte.servicio.ServicioUsuario;
 import com.martiniriarte.servicio.UserDetailsServiceImpl;
 
 import lombok.RequiredArgsConstructor;
