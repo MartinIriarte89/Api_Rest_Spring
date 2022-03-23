@@ -26,6 +26,7 @@ public class SeguridadConfig extends WebSecurityConfigurerAdapter {
 		private final UserDetailsService userDetailsService;
 		private final PasswordEncoder passwordEncoder;
 		private final JwtAuthenticationEntryPoint authenticationEntryPoint;
+		private final JwtAuthoritationFilter authoritationFilter;
 		
 		@Override
 		protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -56,6 +57,6 @@ public class SeguridadConfig extends WebSecurityConfigurerAdapter {
 					.antMatchers(HttpMethod.POST, "/pedido/**").hasAnyRole("USER","ADMIN")
 					.anyRequest().authenticated();
 			
-			http.addFilterBefore(null, UsernamePasswordAuthenticationFilter.class);
+			http.addFilterBefore(authoritationFilter, UsernamePasswordAuthenticationFilter.class);
 		}
 }

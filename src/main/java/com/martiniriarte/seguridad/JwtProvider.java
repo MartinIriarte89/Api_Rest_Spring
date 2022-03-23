@@ -56,7 +56,7 @@ public class JwtProvider {
 
 	}
 
-	public Long obtenerIdFromJWT(String token) {
+	public Long obtenerIdDeJWT(String token) {
 		JwtParser parseToken = getParseToken();
 		Claims claims = parseToken.parseClaimsJws(token).getBody();
 
@@ -67,7 +67,7 @@ public class JwtProvider {
 		return Jwts.parserBuilder().setSigningKey(Keys.hmacShaKeyFor(jwtSecreto.getBytes())).build();
 	}
 
-	public boolean validateToken(String authToken) {
+	public boolean esValido(String authToken) {
 
 		try {
 			JwtParser parseToken = getParseToken();
